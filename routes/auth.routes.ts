@@ -17,4 +17,14 @@ router.post('/login',
     validateFields
 ,auth.login);
 
+router.post('/google',
+    check('id_token','Es necesario el Id Token').not().isEmpty(),
+    validateFields
+,auth.googleSignIn);
+
+router.post('/logout',
+    check('id_token','Es necesario el Id Token').not().isEmpty(),
+    validateFields
+,auth.googleLogout);
+
 export default router;
