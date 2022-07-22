@@ -1,11 +1,11 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import jwt from 'jsonwebtoken';
+import jwt, { Secret } from 'jsonwebtoken';
 
 export const ganerateJWT= (uid:string =''):Promise<any> =>{
-
     return new Promise((resolve,reject) => {
+        console.log(uid);
         const payload={ uid };
         jwt.sign(payload,process.env.PRIVATE_KEY,{
 

@@ -6,7 +6,7 @@ import UsersController from "../controllers/users.controller";
 import { isValidRole, isValidEmail, isValidUser } from '../helpers/db-validators';
 
 // Middleware personalizado
-import validateFields from "../middlewares/validateUser";
+import validateFields from "../middlewares/validate-fields";
 import { validateJWT } from '../middlewares/validate-jwt';
 import { isAdminRole, hasRole } from '../middlewares/validate-roles';
 

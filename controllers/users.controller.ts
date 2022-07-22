@@ -2,7 +2,6 @@ import { response } from 'express';
 
 import User from "../models/user.model";
 import { passwordHash } from "../helpers/hash";
-import { isNumberObject } from "util/types";
 import { UserInterface } from '../interfaces/user.interface';
 
 class UsersController{
@@ -38,7 +37,7 @@ class UsersController{
                 .limit(limit)
         ]);
 
-        res.json({
+        return res.json({
             total,
             users
         });
@@ -49,7 +48,7 @@ class UsersController{
         
         const userFromDB=await User.findById(id);
         
-        res.json({
+        return res.json({
             userFromDB
         });
     }
@@ -62,7 +61,7 @@ class UsersController{
             restData.password=passwordHash(password);
         }
         const userFromDB=await User.findByIdAndUpdate(id,restData);
-        res.json({
+        return res.json({
             userFromDB
         });
     }
@@ -80,7 +79,7 @@ class UsersController{
             throw new Error('Fallo al guardar el usuario');
         }
         
-        res.json({
+        return res.json({
             user
         });
     }
@@ -90,7 +89,7 @@ class UsersController{
         // usuario a borrar
         const id=req.params.id;
         const userFromDB=await User.findByIdAndUpdate(id,{status:false});
-        res.json({
+        return res.json({
             userFromDB,
             userAuthorized
         });

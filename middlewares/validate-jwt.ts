@@ -8,13 +8,24 @@ import { UserInterface } from '../interfaces/user.interface';
 
 export const validateJWT= async (req=request,res = response, next:Function):any =>{
 
+    let token:string='';
 
-    const token=req.header('x-token');
-    if(!token) {
-        return response.status(401).json({
-            msg:'Token no válido'
+    try {
+        token=req.header('x-token');
+        if(!token) {
+            return response.status(401).json({
+                msg:'Token no válido'
+            });
+        }
+    } catch (error) {
+        console.log('Token inválido.')
+        res.status(500).json({
+            msg:'Token inválido. Hable con el admin.'
         });
+        return false;
     }
+    
+
     try {
 
         const {uid}= jwt.verify(token,process.env.PRIVATE_KEY);

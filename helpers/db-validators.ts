@@ -1,5 +1,6 @@
 import Role from "../models/role.model";
 import User from "../models/user.model";
+import Category from "../models/category.model";
 
 export const isValidRole= async (role='')=>{
     const roleExist = await Role.findOne({role});
@@ -18,6 +19,13 @@ export const isValidEmail=async (email='')=>{
 export const isValidUser=async (id='')=>{
     const userExist= await User.findById(id);
     if(!userExist){
+        throw new Error(`El id: ${id} no es válido.`);
+    }
+}
+
+export const isValidCategory=async (id='')=>{
+    const categoryExist= await Category.findById(id);
+    if(!categoryExist){
         throw new Error(`El id: ${id} no es válido.`);
     }
 }

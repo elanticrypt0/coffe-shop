@@ -4,7 +4,7 @@ import { check } from 'express-validator';
 import AuthController from "../controllers/auth.controller";
 
 // Middleware personalizado
-import validateFields from "../middlewares/validateUser";
+import validateFields from "../middlewares/validate-fields";
 
 
 const router= Router();

@@ -2,20 +2,24 @@ import Express, { Application } from "express";
 import Cors from "cors";
 import routerUsers from '../routes/users.routes';
 import routerAuth from '../routes/auth.routes';
+import routerCategories from '../routes/categories.routes';
 import dbConn from "../db/config.db";
 
 class Server{
 
     public app:Application;
     public port:string | undefined;
-    public usersPath:string;
-    public authPath:string;
+    public paths:{};
 
     constructor(){
         this.app = Express();
         this.port=process.env.PORT;
-        this.usersPath='/api/users';
-        this.authPath='/auth';
+
+        this.paths={
+            categories  :'/api/categories',
+            auth        :'/auth',
+            users       :'/api/users',
+        }
 
         //connect to DB
         this.dbConnect();
@@ -39,8 +43,9 @@ class Server{
     }
 
     public routes(){
-        this.app.use( this.authPath, routerAuth );
-        this.app.use( this.usersPath, routerUsers );
+        this.app.use( this.paths.auth, routerAuth );
+        this.app.use( this.paths.users, routerUsers );
+        this.app.use( this.paths.categories, routerCategories );
     }
 
     public listen(){
