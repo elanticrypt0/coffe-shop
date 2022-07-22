@@ -1,12 +1,11 @@
 import { response } from 'express';
 
-import User from "../models/user.model";
+import UserModel from "../models/user.model";
 import { passwordHash } from "../helpers/hash";
 import { UserInterface } from '../interfaces/user.interface';
 
 class UsersController{
     
-
     constructor(){
         
     }
@@ -31,8 +30,8 @@ class UsersController{
         
         // De esta forma ejecuto las dos promesas juntas. Hasta que no terminan las dos no obtengo el result.
         const [total,users]=await Promise.all([
-            User.countDocuments(query),
-            User.find(query)
+            UserModel.countDocuments(query),
+            UserModel.find(query)
                 .skip(from)
                 .limit(limit)
         ]);
@@ -46,10 +45,10 @@ class UsersController{
         
         const id=req.params.id;
         
-        const userFromDB=await User.findById(id);
+        const userFromDB=await UserModel.findById(id);
         
         return res.json({
-            userFromDB
+            user:userFromDB
         });
     }
     public async put(req:any,res=response):Promise<any>{
@@ -60,15 +59,15 @@ class UsersController{
         if(password){
             restData.password=passwordHash(password);
         }
-        const userFromDB=await User.findByIdAndUpdate(id,restData);
+        const userFromDB=await UserModel.findByIdAndUpdate(id,restData);
         return res.json({
-            userFromDB
+            user:userFromDB
         });
     }
     public async post(req:any,res=response):Promise<any>{
 
         const { name, email, password, role }= req.body;
-        const user=new User({name, email, password,role});        
+        const user=new UserModel({name, email, password,role});        
         // encriptar passw
         user.password = passwordHash(password);
         // guardar en db
@@ -88,7 +87,7 @@ class UsersController{
         const userAuthorized:UserInterface | null=req.userAuthorized;
         // usuario a borrar
         const id=req.params.id;
-        const userFromDB=await User.findByIdAndUpdate(id,{status:false});
+        const userFromDB=await UserModel.findByIdAndUpdate(id,{status:false});
         return res.json({
             userFromDB,
             userAuthorized

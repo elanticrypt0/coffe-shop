@@ -1,13 +1,13 @@
 import { response } from 'express';
 
-import CategoryModel from "../models/category.model";
-import { CategoryInterface } from '../interfaces/category.interface';
+import ProductModel from "../models/product.model";
+import { ProductInterface } from '../interfaces/product.interface';
 import { UserInterface } from '../interfaces/user.interface';
 
 
-class CategoriesController{
-
+class ProductsController{
     
+
     constructor(){
         
     }
@@ -23,9 +23,8 @@ class CategoriesController{
         if(isNaN(from)) from=0;
         if(isNaN(limit)) limit=1;
         const [total,categories]=await Promise.all([
-            CategoryModel.countDocuments(query),
-            CategoryModel.find(query)
-                .populate('created_by','email')    
+            ProductModel.countDocuments(query),
+            ProductModel.find(query)
                 .skip(from)
                 .limit(limit)
         ]);
@@ -40,10 +39,10 @@ class CategoriesController{
 
         const id=req.params.id;
         
-        const categoryFromDB=await CategoryModel.findById(id).populate('created_by','email');
+        const ProductFromDB=await ProductModel.findById(id);
         
         return res.json({
-            category:categoryFromDB
+            Product:ProductFromDB
         });
         
     }
@@ -52,22 +51,23 @@ class CategoriesController{
         const name=req.body.name.toUpperCase();
         const userAuthorized:UserInterface | null =req.userAuthorized;
         
-        const categoryInDB:CategoryInterface | null=await CategoryModel.findOne({name});
-        if(categoryInDB){
+        const ProductInDB:ProductInterface | null=await ProductModel.findOne({name});
+        if(ProductInDB){
             return res.status(400).json({
                 msg:`La categoría ${name} ya existe.`
             });
         }
-        const category=new CategoryModel({
+
+        const product=new ProductModel({
             name,
             status:true,
             created_by:userAuthorized._id
         });
         try {
-            await category.save();
+            await product.save();
         
             return res.status(200).json({
-                category,
+                Product: ProductModel,
                 userAuthorized
             });
         } catch (error) {
@@ -84,17 +84,12 @@ class CategoriesController{
         const id=req.params.id;
         const name=req.body.name.toUpperCase();
 
-        try {
-            const categoryFromDB=await CategoryModel.findByIdAndUpdate(id,{name,created_by:userAuthorized?._id},{new:true}).populate('created_by','email');
-            
-            return res.json({
-                category:categoryFromDB,
-            });
-        } catch (error) {
-            return res.status(500).json({
-                msg:'Error del servidor.'
-            });
-        }
+        const ProductFromDB=await ProductModel.findByIdAndUpdate(id,{name,created_by:userAuthorized?._id});
+        ProductFromDB.name=name;
+
+        return res.json({
+            Product:ProductFromDB
+        });
 
     }
     public async delete(req:any ,res=response):Promise<any>{
@@ -102,13 +97,13 @@ class CategoriesController{
         const userAuthorized:UserInterface | null=req.userAuthorized;
         // usuario a borrar
         const id=req.params.id;
-        const categoryFromDB=await CategoryModel.findByIdAndUpdate(id,{status:false});
+        const ProductFromDB=await ProductModel.findByIdAndUpdate(id,{status:false});
         return res.json({
-            categoryFromDB,
+            ProductFromDB,
             userAuthorized
         });
     }
 
 }
 
-export default CategoriesController;
+export default ProductsController;

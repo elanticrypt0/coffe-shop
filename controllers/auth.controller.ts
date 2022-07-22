@@ -1,11 +1,13 @@
 import { response, request } from 'express';
-import User from "../models/user.model";
+import UserModel from "../models/user.model";
 import bcryptjs from 'bcryptjs';
 import { ganerateJWT } from '../helpers/generate-jwt';
 import { googleVerify } from '../helpers/google-verify';
+// import { Model } from 'mongoose';
 
 
 class AuthController{
+
 
     constructor(){
     }
@@ -19,7 +21,7 @@ class AuthController{
 
         try {
             
-            const user= await User.findOne({email});
+            const user= await UserModel.findOne({email});
             if(!user){
                 return res.status(400).json({
                     msg:'Usuario / password no son correctos - email'
@@ -58,7 +60,7 @@ class AuthController{
            
             const {email,name,img}=await googleVerify(id_token);
 
-            let user= await User.findOne({email});            
+            let user= await UserModel.findOne({email});            
 
             //? si el usuario no existe entonces lo crea en la base de datos
 
@@ -73,7 +75,7 @@ class AuthController{
                 }
 
                 user=new User(data);
-                await user.save();
+                await UserModel.save();
             }
 
             if(!user.status){

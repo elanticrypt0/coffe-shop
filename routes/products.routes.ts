@@ -2,7 +2,7 @@ import { Router } from "express";
 import { check } from 'express-validator';
 import mongoose from "mongoose";
 
-import CategoriesController from "../controllers/categories.controller";
+import ProductsController from "../controllers/products.controller";
 
 
 // Middleware personalizado
@@ -14,32 +14,30 @@ import { isValidCategory } from '../helpers/db-validators';
 
 
 const router= Router();
-const categories=new CategoriesController();
+const Products=new ProductsController();
 
 // public
 router.get('/',
         validateFields
-,categories.get);
+,Products.get);
 // publico
 router.get('/:id',
         check('id').custom(mongoose.Types.ObjectId.isValid),
         check('id').custom(isValidCategory),
         validateFields
-,categories.getOnlyOne);
+,Products.getOnlyOne);
 // privado con token
 router.post('/',
         validateJWT,
         check('name','El nombre del obligatorio').not().isEmpty(),
         validateFields
-,categories.post);
+,Products.post);
 // validar privado con token
 router.put('/:id',
         validateJWT,
         check('name','El nombre del obligatorio').not().isEmpty(),
-        check('id').custom(mongoose.Types.ObjectId.isValid),
-        check('id').custom(isValidCategory),
         validateFields
-,categories.put);
+,Products.put);
 // privado con token
 router.delete('/:id',
         validateJWT,
@@ -47,7 +45,7 @@ router.delete('/:id',
         check('id').custom(mongoose.Types.ObjectId.isValid),
         check('id').custom(isValidCategory),
         validateFields
-,categories.delete);
+,Products.delete);
 
 
 export default router;

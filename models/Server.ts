@@ -3,6 +3,7 @@ import Cors from "cors";
 import routerUsers from '../routes/users.routes';
 import routerAuth from '../routes/auth.routes';
 import routerCategories from '../routes/categories.routes';
+import routerProducts from '../routes/products.routes';
 import dbConn from "../db/config.db";
 
 class Server{
@@ -16,8 +17,9 @@ class Server{
         this.port=process.env.PORT;
 
         this.paths={
-            categories  :'/api/categories',
             auth        :'/auth',
+            categories  :'/api/categories',
+            products    :'/api/products',
             users       :'/api/users',
         }
 
@@ -44,8 +46,9 @@ class Server{
 
     public routes(){
         this.app.use( this.paths.auth, routerAuth );
-        this.app.use( this.paths.users, routerUsers );
         this.app.use( this.paths.categories, routerCategories );
+        this.app.use( this.paths.products, routerProducts );
+        this.app.use( this.paths.users, routerUsers );
     }
 
     public listen(){
