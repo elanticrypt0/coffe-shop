@@ -21,12 +21,6 @@ router.get('/:id',
         check('id').custom(isValidUser),
         validateFields
 , users.getOnlyOne);
-router.put('/:id',
-        check('id').custom(mongoose.Types.ObjectId.isValid),
-        check('id').custom(isValidUser),
-        check('role').custom(isValidRole),
-        validateFields
-, users.put);
 router.post('/',
         check('email','Correo no válido').isEmail(),
         check('email').custom(isValidEmail),
@@ -35,6 +29,12 @@ router.post('/',
         check('role').custom(isValidRole),
         validateFields
 ,users.post);
+router.put('/:id',
+        check('id').custom(mongoose.Types.ObjectId.isValid),
+        check('id').custom(isValidUser),
+        check('role').custom(isValidRole),
+        validateFields
+, users.put);
 router.delete('/:id',
         validateJWT,
         hasRole('ADMIN','SALES'),

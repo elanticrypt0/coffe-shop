@@ -22,16 +22,18 @@ class ProductsController{
         
         if(isNaN(from)) from=0;
         if(isNaN(limit)) limit=1;
-        const [total,categories]=await Promise.all([
+        const [total,products]=await Promise.all([
             ProductModel.countDocuments(query),
             ProductModel.find(query)
+                .populate('created_by','email')
+                .populate('category','name')
                 .skip(from)
                 .limit(limit)
         ]);
 
         return res.json({
             total,
-            categories
+            products
         });
 
     }
@@ -39,7 +41,9 @@ class ProductsController{
 
         const id=req.params.id;
         
-        const ProductFromDB=await ProductModel.findById(id);
+        const ProductFromDB=await ProductModel.findById(id)
+                            .populate('created_by','email')
+                            .populate('category','name');
         
         return res.json({
             Product:ProductFromDB
@@ -48,26 +52,30 @@ class ProductsController{
     }
     public async post(req:any ,res=response):Promise<any>{
 
-        const name=req.body.name.toUpperCase();
         const userAuthorized:UserInterface | null =req.userAuthorized;
+        const {name,price,category,description,available} = req.body;
         
         const ProductInDB:ProductInterface | null=await ProductModel.findOne({name});
         if(ProductInDB){
             return res.status(400).json({
-                msg:`La categoría ${name} ya existe.`
+                msg:`El producto ${name} ya existe.`
             });
         }
 
         const product=new ProductModel({
             name,
             status:true,
-            created_by:userAuthorized._id
+            created_by:userAuthorized._id,
+            price,
+            category,
+            description,
+            available
         });
         try {
             await product.save();
         
             return res.status(200).json({
-                Product: ProductModel,
+                product,
                 userAuthorized
             });
         } catch (error) {
@@ -82,11 +90,9 @@ class ProductsController{
         const userAuthorized:UserInterface | null=req.userAuthorized;
         
         const id=req.params.id;
-        const name=req.body.name.toUpperCase();
 
-        const ProductFromDB=await ProductModel.findByIdAndUpdate(id,{name,created_by:userAuthorized?._id});
-        ProductFromDB.name=name;
-
+        const ProductFromDB=await ProductModel.findByIdAndUpdate(id,{name,created_by:userAuthorized?._id},{new:true});
+        
         return res.json({
             Product:ProductFromDB
         });
@@ -99,7 +105,7 @@ class ProductsController{
         const id=req.params.id;
         const ProductFromDB=await ProductModel.findByIdAndUpdate(id,{status:false});
         return res.json({
-            ProductFromDB,
+            product:ProductFromDB,
             userAuthorized
         });
     }

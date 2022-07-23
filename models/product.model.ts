@@ -14,14 +14,29 @@ const ProductSchema= new Schema({
     created_by:{
         type:Schema.Types.ObjectId,
         ref:'User',
-        required: [true,'La categoría debe tener un usuario']
+        required: [true,'El producto debe tener un usuario']
+    },
+    price:{
+        type:Number,
+        default:0,
+    },
+    category:{
+        type:Schema.Types.ObjectId,
+        ref:'Category',
+        required:[true,'La categoría es obligatoria'],
+    },
+    description:{
+        type:String,
+    },
+    available:{
+        type:Boolean,
+        required:[true,'La disponibildiad es obligatoria']
     }
 });
 
 ProductSchema.methods.toJSON = function(){
-    const {__v, _id,...ProductData} = this.toObject();
-    return ProductData;
+    const {__v,...data} = this.toObject();
+    return data;
 }
-
 
 export default model('Product', ProductSchema);

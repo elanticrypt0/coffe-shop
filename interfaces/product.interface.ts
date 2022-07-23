@@ -1,6 +1,10 @@
 export interface ProductInterface{
-    _id?:string,
-    name:string,
-    status:boolean,
-    created_by:string
+    _id?            :string,
+    available       :Boolean,
+    category        :String,
+    created_by      :string,
+    description?    :String,
+    name            :string,
+    price           :Number,
+    status          :boolean,
 }

@@ -51,21 +51,9 @@ class UsersController{
             user:userFromDB
         });
     }
-    public async put(req:any,res=response):Promise<any>{
-        const id=req.params.id;
-        const {_id, password,google, email,...restData}=req.body;
-
-        // si viene el password le user desea actualizar el passw
-        if(password){
-            restData.password=passwordHash(password);
-        }
-        const userFromDB=await UserModel.findByIdAndUpdate(id,restData);
-        return res.json({
-            user:userFromDB
-        });
-    }
+    
     public async post(req:any,res=response):Promise<any>{
-
+        
         const { name, email, password, role }= req.body;
         const user=new UserModel({name, email, password,role});        
         // encriptar passw
@@ -82,6 +70,21 @@ class UsersController{
             user
         });
     }
+
+    public async put(req:any,res=response):Promise<any>{
+        const id=req.params.id;
+        const {_id, password,google, email,...restData}=req.body;
+
+        // si viene el password le user desea actualizar el passw
+        if(password){
+            restData.password=passwordHash(password);
+        }
+        const userFromDB=await UserModel.findByIdAndUpdate(id,restData);
+        return res.json({
+            user:userFromDB
+        });
+    }
+
     public async delete(req:any,res=response):Promise<any>{
         // Este es el usuario que necesito para ejecutar este query
         const userAuthorized:UserInterface | null=req.userAuthorized;

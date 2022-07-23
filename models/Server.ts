@@ -1,9 +1,11 @@
 import Express, { Application } from "express";
 import Cors from "cors";
+
 import routerUsers from '../routes/users.routes';
 import routerAuth from '../routes/auth.routes';
 import routerCategories from '../routes/categories.routes';
 import routerProducts from '../routes/products.routes';
+
 import dbConn from "../db/config.db";
 
 class Server{

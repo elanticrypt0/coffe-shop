@@ -4,48 +4,55 @@ import mongoose from "mongoose";
 
 import ProductsController from "../controllers/products.controller";
 
-
 // Middleware personalizado
 import validateFields from "../middlewares/validate-fields";
 import { validateJWT } from '../middlewares/validate-jwt';
 import { isAdminRole, hasRole } from '../middlewares/validate-roles';
-import { isValidCategory } from '../helpers/db-validators';
+import { isValidProduct,isValidCategory } from '../helpers/db-validators';
 
 
 
 const router= Router();
-const Products=new ProductsController();
+const products=new ProductsController();
 
 // public
 router.get('/',
         validateFields
-,Products.get);
+,products.get);
 // publico
 router.get('/:id',
         check('id').custom(mongoose.Types.ObjectId.isValid),
-        check('id').custom(isValidCategory),
+        check('id').custom(isValidProduct),
         validateFields
-,Products.getOnlyOne);
+,products.getOnlyOne);
 // privado con token
 router.post('/',
         validateJWT,
         check('name','El nombre del obligatorio').not().isEmpty(),
+        check('category','La categoría es obligatoria').not().isEmpty(),
+        check('category').custom(isValidCategory),
+        check('available','La disponiblidad es obligatoria'),
         validateFields
-,Products.post);
+,products.post);
 // validar privado con token
 router.put('/:id',
         validateJWT,
         check('name','El nombre del obligatorio').not().isEmpty(),
+        check('category','La categoría es obligatoria').not().isEmpty(),
+        check('category').custom(isValidCategory),
+        check('available','La disponiblidad es obligatoria'),
+        check('id').custom(mongoose.Types.ObjectId.isValid),
+        check('id').custom(isValidProduct),
         validateFields
-,Products.put);
+,products.put);
 // privado con token
 router.delete('/:id',
         validateJWT,
         hasRole('ADMIN','SALES'),
         check('id').custom(mongoose.Types.ObjectId.isValid),
-        check('id').custom(isValidCategory),
+        check('id').custom(isValidProduct),
         validateFields
-,Products.delete);
+,products.delete);
 
 
 export default router;

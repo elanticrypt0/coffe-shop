@@ -104,7 +104,7 @@ class CategoriesController{
         const id=req.params.id;
         const categoryFromDB=await CategoryModel.findByIdAndUpdate(id,{status:false});
         return res.json({
-            categoryFromDB,
+            category:categoryFromDB,
             userAuthorized
         });
     }
