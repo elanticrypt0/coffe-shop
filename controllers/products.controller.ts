@@ -61,7 +61,7 @@ class ProductsController{
                 msg:`El producto ${name} ya existe.`
             });
         }
-
+        
         const product=new ProductModel({
             name,
             status:true,
@@ -73,7 +73,7 @@ class ProductsController{
         });
         try {
             await product.save();
-        
+            
             return res.status(200).json({
                 product,
                 userAuthorized
@@ -88,14 +88,28 @@ class ProductsController{
     public async put(req:any ,res=response):Promise<any>{
         
         const userAuthorized:UserInterface | null=req.userAuthorized;
+        const {name,price,category,description,available} = req.body;
         
         const id=req.params.id;
-
-        const ProductFromDB=await ProductModel.findByIdAndUpdate(id,{name,created_by:userAuthorized?._id},{new:true});
         
-        return res.json({
-            Product:ProductFromDB
-        });
+        try{
+            const ProductFromDB=await ProductModel.findByIdAndUpdate(id,{
+                name,
+                price,
+                category,
+                description,
+                available,
+                created_by:userAuthorized?._id
+            },{new:true});
+
+            return res.json({
+            product:ProductFromDB
+            });
+        }catch(error){
+            return res.status(500).json({
+                msg:'Error del servidor. No se pudo modificar el producto.'
+            });
+        }
 
     }
     public async delete(req:any ,res=response):Promise<any>{
