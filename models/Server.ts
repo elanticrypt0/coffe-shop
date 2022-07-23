@@ -1,10 +1,12 @@
 import Express, { Application } from "express";
 import Cors from "cors";
+import Fileupload from 'express-fileupload';
 
 import routerAuth from '../routes/auth.routes';
 import routerCategories from '../routes/categories.routes';
 import routerProducts from '../routes/products.routes';
 import routerSearch from '../routes/search.routes';
+import routerUploads from '../routes/uploads.routes';
 import routerUsers from '../routes/users.routes';
 
 import dbConn from "../db/config.db";
@@ -24,6 +26,7 @@ class Server{
             categories  :'/api/categories',
             products    :'/api/products',
             search      :'/api/search',
+            uploads     :'/api/uploads',
             users       :'/api/users',
         }
 
@@ -46,6 +49,13 @@ class Server{
 
         // public directory
         this.app.use( Express.static('public') );
+
+        // uploadFiles config
+        this.app.use(Fileupload({
+            useTempFiles : true,
+            tempFileDir : '/tmp/'
+        }));
+
     }
 
     public routes(){
@@ -53,11 +63,13 @@ class Server{
         this.app.use( this.paths.categories, routerCategories );
         this.app.use( this.paths.products, routerProducts );
         this.app.use( this.paths.search, routerSearch );
+        this.app.use( this.paths.uploads, routerUploads );
         this.app.use( this.paths.users, routerUsers );
     }
 
     public listen(){
         this.app.listen(this.port, () =>{
+            console.log('###  Starting Server ###');
             console.log(`Listening port: ${this.port}`);
         });
     }
