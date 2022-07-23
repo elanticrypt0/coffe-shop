@@ -1,10 +1,11 @@
 import Express, { Application } from "express";
 import Cors from "cors";
 
-import routerUsers from '../routes/users.routes';
 import routerAuth from '../routes/auth.routes';
 import routerCategories from '../routes/categories.routes';
 import routerProducts from '../routes/products.routes';
+import routerSearch from '../routes/search.routes';
+import routerUsers from '../routes/users.routes';
 
 import dbConn from "../db/config.db";
 
@@ -22,6 +23,7 @@ class Server{
             auth        :'/auth',
             categories  :'/api/categories',
             products    :'/api/products',
+            search      :'/api/search',
             users       :'/api/users',
         }
 
@@ -50,6 +52,7 @@ class Server{
         this.app.use( this.paths.auth, routerAuth );
         this.app.use( this.paths.categories, routerCategories );
         this.app.use( this.paths.products, routerProducts );
+        this.app.use( this.paths.search, routerSearch );
         this.app.use( this.paths.users, routerUsers );
     }
 
