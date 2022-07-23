@@ -81,21 +81,11 @@ const findInProducts = async (term:string):Promise =>{
 
 const findInProductsByCategory = async (term:string):Promise =>{
     
-    //primero traigo el nombre de la categoría
+    let results:any[]=[];
     
     const regExp=new RegExp(term,'i');
     const categories=await CategoryModel.find({name:regExp, status:true});
-    console.log(categories.length);
-    let results:any[]=[];
-
-    // results=categories.map(async (elem)=>{
-    //     const isMongoId:Boolean=isValidObjectId(elem?._id);
-    //     if(isMongoId){
-    //         results=await ProductModel.findById(elem?._id).populate('category','name');;
-    //     }
-
-    // });
-
+    
     for (let elem of categories){
         const isMongoId:Boolean=isValidObjectId(elem?._id);
         if(isMongoId){

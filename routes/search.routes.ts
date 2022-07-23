@@ -13,6 +13,7 @@ import { isValidProduct,isValidCategory } from '../helpers/db-validators';
 const router= Router();
 const search=new SearchController();
 
+
 router.get('/:collection/:term'
 ,search.find)
 
