@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { check } from 'express-validator';
-import mongoose from "mongoose";
 
 import ProductsController from "../controllers/products.controller";
 
@@ -21,7 +20,7 @@ router.get('/',
 ,products.get);
 // publico
 router.get('/:id',
-        check('id').custom(mongoose.Types.ObjectId.isValid),
+        check('id','El id es obligatorio').isMongoId(),
         check('id').custom(isValidProduct),
         validateFields
 ,products.getOnlyOne);
@@ -41,7 +40,7 @@ router.put('/:id',
         check('category','La categoría es obligatoria').not().isEmpty(),
         check('category').custom(isValidCategory),
         check('available','La disponiblidad es obligatoria'),
-        check('id').custom(mongoose.Types.ObjectId.isValid),
+        check('id','El id es obligatorio').isMongoId(),
         check('id').custom(isValidProduct),
         validateFields
 ,products.put);
@@ -49,7 +48,7 @@ router.put('/:id',
 router.delete('/:id',
         validateJWT,
         hasRole('ADMIN','SALES'),
-        check('id').custom(mongoose.Types.ObjectId.isValid),
+        check('id','El id es obligatorio').isMongoId(),
         check('id').custom(isValidProduct),
         validateFields
 ,products.delete);

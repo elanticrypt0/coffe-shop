@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { check } from 'express-validator';
-import mongoose from "mongoose";
 
 import CategoriesController from "../controllers/categories.controller";
 
@@ -22,7 +21,7 @@ router.get('/',
 ,categories.get);
 // publico
 router.get('/:id',
-        check('id').custom(mongoose.Types.ObjectId.isValid),
+        check('id','El id es obligatorio').isMongoId(),
         check('id').custom(isValidCategory),
         validateFields
 ,categories.getOnlyOne);
@@ -36,7 +35,7 @@ router.post('/',
 router.put('/:id',
         validateJWT,
         check('name','El nombre del obligatorio').not().isEmpty(),
-        check('id').custom(mongoose.Types.ObjectId.isValid),
+        check('id','El id es obligatorio').isMongoId(),
         check('id').custom(isValidCategory),
         validateFields
 ,categories.put);
@@ -44,7 +43,7 @@ router.put('/:id',
 router.delete('/:id',
         validateJWT,
         hasRole('ADMIN','SALES'),
-        check('id').custom(mongoose.Types.ObjectId.isValid),
+        check('id','El id es obligatorio').isMongoId(),
         check('id').custom(isValidCategory),
         validateFields
 ,categories.delete);

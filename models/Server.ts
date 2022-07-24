@@ -52,6 +52,7 @@ class Server{
 
         // uploadFiles config
         this.app.use(Fileupload({
+            createParentPath:true,
             useTempFiles : true,
             tempFileDir : '/tmp/'
         }));

@@ -24,7 +24,7 @@ const uploadFile= async (files:any, fileTypesAllowed:String[]=[],imagesFolder:St
         
         try {
         
-            fileTypesAllowed= (fileTypesAllowed.length < 0)? fileTypesAllowed : fileTypesAllowedDefault;
+            fileTypesAllowed= (fileTypesAllowed.length > 0)? fileTypesAllowed : fileTypesAllowedDefault;
 
             const {fileUp}=files;
             
