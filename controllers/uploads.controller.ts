@@ -1,4 +1,6 @@
-import { resolveSoa } from 'dns';
+import path from 'path';
+import fs from 'fs';
+
 import { response } from 'express';
 import uploadFile from '../helpers/upload-file';
 
@@ -45,12 +47,19 @@ class UploadsController{
                 let fullPath:string;
                 switch (collection) {
                     case 'users':
+                            
                             model=await UserModel.findById(id);
+                            
                             if(!model){
                                 return res.status(400).json({
                                     msg:'No existe un usuario con ese ID'
                                 });
                             }
+
+                            if(model.img){
+                                deleteImgIfExist(model.img,collection);
+                            }
+                            
                             fullPath=await uploadFile(req.files,[],collection.toLowerCase()).then((resp)=>{
                                 model.img=resp;
                             }).catch(err => {
@@ -58,15 +67,24 @@ class UploadsController{
                                     err
                                 });
                             });
+                            
                             await model.save();
+
                         break;
                     case 'products':
+
                         model=await ProductModel.findById(id);
+                        
                         if(!model){
                             return res.status(400).json({
                                 msg:'No existe un producto con ese ID'
                             });
                         }
+
+                        if(model.img){
+                            deleteImgIfExist(model.img,collection);
+                        }
+                        
                         fullPath=await uploadFile(req.files,[],collection.toLowerCase()).then((resp)=>{
                             model.img=resp;
                         }).catch(err => {
@@ -74,7 +92,9 @@ class UploadsController{
                                 err
                             });
                         });
+                        
                         await model.save();
+
                     break;
                     default:
                         break;
@@ -95,7 +115,76 @@ class UploadsController{
         return true;
     }
 
+    public async get(req,res=response):any{
 
+        const {id, collection}= req.params;
+        let img:string=defaultImg;
+        try {
+            
+                let model: any;
+                switch (collection) {
+                    case 'users':
+                            
+                            model=await UserModel.findById(id);
+                            
+                            if(!model){
+                                return res.status(400).json({
+                                    msg:'No existe un usuario con ese ID'
+                                });
+                            }
+                            
+                            return res.sendFile(getImagePath(model.img,collection));
+                            
+                            break;
+                            case 'products':
+                                
+                                model=await ProductModel.findById(id);
+                                
+                                if(!model){
+                                    return res.status(400).json({
+                                        msg:'No existe un producto con ese ID'
+                                    });
+                                }
+                                
+                                return res.sendFile(getImagePath(model.img,collection));
+
+                    break;
+                }
+
+        } catch (error) {
+            res.status(400).json({
+                error
+            });
+            
+        }
+
+        return true;
+    }
+
+
+}
+
+const defaultImg='no-image.jpg';
+
+const getImagePath=(img:string,imagesFolder:string)=>{
+    
+    const imgPath:string= (img)? path.join(__dirname,'../uploads/', imagesFolder,img)
+                                : path.join(__dirname,'../uploads/',defaultImg);
+    
+    if(fs.existsSync(imgPath)){
+        return imgPath;
+    }
+    
+    return false;
+}
+
+const deleteImgIfExist=(img:string,imagesFolder:string):boolean =>{
+    const imgPath= getImagePath(img,imagesFolder);
+    if(fs.existsSync(imgPath)){
+        fs.unlinkSync(imgPath);
+        return true;
+    }
+    return false;
 }
 
 

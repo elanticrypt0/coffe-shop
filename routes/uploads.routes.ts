@@ -27,4 +27,9 @@ router.put('/:collection/:id',
     validateFields
 ,uploads.put);
 
+router.get('/:collection/:id',
+    check('id','El ID es obligatorio').isMongoId(),
+    check('collection').custom(c => isValidCollection(c, ['users','products'])),
+validateFields,uploads.get);
+
 export default router;
