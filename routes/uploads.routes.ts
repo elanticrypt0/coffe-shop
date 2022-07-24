@@ -13,11 +13,11 @@ import validateFiles from '../middlewares/validate-files';
 const router= Router();
 const uploads=new UploadsController();
 
-router.post('/',
-    validateJWT,
-    validateFiles,
-    validateFields
-,uploads.post);
+// router.post('/',
+//     validateJWT,
+//     validateFiles,
+//     validateFields
+// ,uploads.post);
 
 router.put('/:collection/:id',
     validateJWT,

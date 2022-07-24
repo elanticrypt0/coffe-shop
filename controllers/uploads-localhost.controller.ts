@@ -1,21 +1,39 @@
-import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 
 import { response } from 'express';
+import uploadFile from '../helpers/upload-file';
 
 import UserModel from '../models/user.model';
 import ProductModel from '../models/product.model';
 
-import Cloudinary from 'cloudinary';
-
-dotenv.config();
-Cloudinary.config(process.env.CLOUDINARY_URL);
-
-
 class UploadsController{
 
     constructor() {}
+
+    public async post(req,res=response):any{
+
+        try {
+            
+            const fullPath=await uploadFile(req.files,['txt']).then((resp)=>{
+                return res.status(400).json({
+                    file:resp
+                });
+            }).catch(err => {
+                res.status(400).json({
+                    err
+                });
+            });
+
+        } catch (error) {
+
+            res.status(400).json({
+                error
+            });
+            
+        }
+        
+    }
 
     public async put(req,res=response):any{
 
@@ -36,11 +54,18 @@ class UploadsController{
                             }
 
                             if(model.img){
-                                deleteImgIfExist(model.img);
+                                deleteImgIfExist(model.img,collection);
                             }
-                                                    
-                            model.img=await uploadFile2Cloudinary(req.files.fileUp);
-                            if(model) await model.save();
+                            
+                            fullPath=await uploadFile(req.files,[],collection.toLowerCase()).then((resp)=>{
+                                model.img=resp;
+                            }).catch(err => {
+                                res.status(400).json({
+                                    err
+                                });
+                            });
+                            
+                            await model.save();
 
                         break;
                     case 'products':
@@ -54,11 +79,18 @@ class UploadsController{
                         }
 
                         if(model.img){
-                            deleteImgIfExist(model.img);
+                            deleteImgIfExist(model.img,collection);
                         }
-                                                
-                        model.img=await uploadFile2Cloudinary(req.files.fileUp);
-                        if(model) await model.save();
+                        
+                        fullPath=await uploadFile(req.files,[],collection.toLowerCase()).then((resp)=>{
+                            model.img=resp;
+                        }).catch(err => {
+                            res.status(400).json({
+                                err
+                            });
+                        });
+                        
+                        await model.save();
 
                     break;
                     default:
@@ -83,7 +115,7 @@ class UploadsController{
     public async get(req,res=response):any{
 
         const {id, collection}= req.params;
-        let img:string='';
+        let img:string=defaultImg;
         try {
             
                 let model: any;
@@ -97,10 +129,8 @@ class UploadsController{
                                     msg:'No existe un usuario con ese ID'
                                 });
                             }
-                                img=getImagePath(model.img);
-                                return res.status(200).json({
-                                    img
-                                });
+                            
+                            return res.sendFile(getImagePath(model.img,collection));
                             
                             break;
                             case 'products':
@@ -113,10 +143,7 @@ class UploadsController{
                                     });
                                 }
                                 
-                                img=getImagePath(model.img);
-                                return res.status(200).json({
-                                    img
-                                });
+                                return res.sendFile(getImagePath(model.img,collection));
 
                     break;
                 }
@@ -134,41 +161,27 @@ class UploadsController{
 
 }
 
-const defaultImg='https://res.cloudinary.com/dec1fgp2b/image/upload/v1658632064/no-image_x5xkv5.jpg';
+const defaultImg='no-image.jpg';
 
-const getImagePath=(img:string)=>{
+const getImagePath=(img:string,imagesFolder:string)=>{
     
-    console.log(img);
-
-    const imgPath:string= (img)?? defaultImg;
+    const imgPath:string= (img)? path.join(__dirname,'../uploads/', imagesFolder,img)
+                                : path.join(__dirname,'../uploads/',defaultImg);
     
-    return imgPath;
-}
-
-const getCloudinaryImgId=(img:string)=>{
-    return img.substring(img.lastIndexOf('/')+1,img.lastIndexOf('.'));
-}
-
-const deleteImgIfExist= async (img:string):boolean =>{
-    if(img){
-        
-        Cloudinary.v2.uploader.destroy(getCloudinaryImgId(img));
-        return true;
-
+    if(fs.existsSync(imgPath)){
+        return imgPath;
     }
+    
     return false;
 }
 
-const uploadFile2Cloudinary=async (file:any)=>{
-
-    try {
-        const {secure_url} = await Cloudinary.v2.uploader.upload(file.tempFilePath);
-        return secure_url
-    } catch (error) {
-        console.log(error);
-        return false;
+const deleteImgIfExist=(img:string,imagesFolder:string):boolean =>{
+    const imgPath= getImagePath(img,imagesFolder);
+    if(fs.existsSync(imgPath)){
+        fs.unlinkSync(imgPath);
+        return true;
     }
-
+    return false;
 }
 
 
